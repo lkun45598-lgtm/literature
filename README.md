@@ -1,4 +1,4 @@
-# Paper Hub — Team Literature Knowledge Base
+# Data Hub — Team Literature Knowledge Base
 
 A structured, peer-reviewed knowledge base for tracking, evaluating, and organizing research papers across the team's active domains and projects. Built on GitHub native features.
 
