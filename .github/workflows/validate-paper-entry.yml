@@ -1,0 +1,123 @@
+name: Validate Paper Entry
+
+on:
+  pull_request:
+    paths:
+      - 'domains/**/*.md'
+    branches:
+      - main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install pyyaml
+
+      - name: Get changed files
+        id: changed
+        run: |
+          FILES=$(git diff --name-only --diff-filter=AMRC origin/main...HEAD | grep '^domains/.*\.md$' | grep -v 'README.md' || true)
+          echo "files<<EOF" >> $GITHUB_OUTPUT
+          echo "$FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Validate paper entries
+        run: |
+          python3 << 'PYEOF'
+          import sys
+          import os
+          import yaml
+
+          VALID_DOMAINS = {"ocean-forecasting", "scientific-sr", "uncertainty-calibration", "code-agent"}
+          VALID_STATUSES = {"backlog", "curated"}
+          REQUIRED_FIELDS = ["title", "authors", "year", "venue", "url", "domain", "tags", "status", "added_by", "added_date"]
+
+          changed_files = """${{ steps.changed.outputs.files }}""".strip().split('\n')
+          changed_files = [f for f in changed_files if f.strip()]
+
+          if not changed_files:
+              print("No paper entry files changed. Skipping validation.")
+              sys.exit(0)
+
+          errors = []
+
+          for filepath in changed_files:
+              if not os.path.exists(filepath):
+                  continue
+
+              with open(filepath, 'r', encoding='utf-8') as f:
+                  content = f.read()
+
+              # Check front matter exists
+              if not content.startswith('---'):
+                  errors.append(f"{filepath}: Missing YAML front matter (must start with ---)")
+                  continue
+
+              parts = content.split('---', 2)
+              if len(parts) < 3:
+                  errors.append(f"{filepath}: Malformed YAML front matter (missing closing ---)")
+                  continue
+
+              # Parse YAML
+              try:
+                  meta = yaml.safe_load(parts[1])
+              except yaml.YAMLError as e:
+                  errors.append(f"{filepath}: YAML parse error: {e}")
+                  continue
+
+              if not isinstance(meta, dict):
+                  errors.append(f"{filepath}: Front matter is not a valid YAML mapping")
+                  continue
+
+              # Check required fields
+              for field in REQUIRED_FIELDS:
+                  if field not in meta or meta[field] is None or str(meta[field]).strip() == "":
+                      errors.append(f"{filepath}: Missing or empty required field: {field}")
+
+              # Validate domain
+              domain = meta.get("domain", "")
+              if domain and domain not in VALID_DOMAINS:
+                  errors.append(f"{filepath}: Invalid domain '{domain}'. Must be one of: {', '.join(sorted(VALID_DOMAINS))}")
+
+              # Validate status
+              status = meta.get("status", "")
+              if status and status not in VALID_STATUSES:
+                  errors.append(f"{filepath}: Invalid status '{status}'. Must be one of: {', '.join(sorted(VALID_STATUSES))}")
+
+              # Path consistency: domain in path matches front matter
+              path_parts = filepath.split('/')
+              if len(path_parts) >= 2 and domain:
+                  path_domain = path_parts[1]  # domains/<domain>/...
+                  if path_domain != domain:
+                      errors.append(f"{filepath}: Path domain '{path_domain}' does not match front matter domain '{domain}'")
+
+              # Path consistency: status in path matches front matter
+              if len(path_parts) >= 3 and status:
+                  path_status = path_parts[2]  # domains/<domain>/<status>/...
+                  if path_status in VALID_STATUSES and path_status != status:
+                      errors.append(f"{filepath}: Path status '{path_status}' does not match front matter status '{status}'")
+
+              # URL format check
+              url = meta.get("url", "")
+              if url and not (str(url).startswith("http://") or str(url).startswith("https://")):
+                  errors.append(f"{filepath}: URL must start with http:// or https://")
+
+          if errors:
+              print("Validation FAILED:")
+              for err in errors:
+                  print(f"  - {err}")
+              sys.exit(1)
+          else:
+              print(f"Validation PASSED for {len(changed_files)} file(s).")
+          PYEOF

@@ -1,0 +1,29 @@
+# Paper-Hub CODEOWNERS
+# Each domain directory is owned by its Domain Owner + Maintainer.
+# PRs touching these paths will automatically request review from the listed owners.
+#
+# Replace placeholder handles (@member-*) with real GitHub usernames.
+
+# Governance
+/PROJECT_CHARTER.md                     @lkun45598-lgtm
+/ROLES.md                               @lkun45598-lgtm
+/CONTRIBUTING.md                        @lkun45598-lgtm
+/README.md                              @lkun45598-lgtm
+
+# Standards
+/standards/                             @lkun45598-lgtm
+
+# GitHub config
+/.github/                               @lkun45598-lgtm
+
+# Domains
+/domains/ocean-forecasting/             @lkun45598-lgtm @member-ocean
+/domains/scientific-sr/                 @lkun45598-lgtm @member-sr
+/domains/uncertainty-calibration/       @lkun45598-lgtm @member-uc
+/domains/code-agent/                    @lkun45598-lgtm @member-agent
+
+# Projects
+/projects/                              @lkun45598-lgtm
+
+# Scripts
+/scripts/                               @lkun45598-lgtm

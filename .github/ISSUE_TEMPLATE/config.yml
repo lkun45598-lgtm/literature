@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: "General Discussion"
+    url: https://github.com/lkun45598-lgtm/literature/discussions
+    about: "For general discussion, reading group coordination, tag proposals, and questions"

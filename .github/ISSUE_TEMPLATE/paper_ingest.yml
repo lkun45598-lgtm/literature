@@ -1,0 +1,189 @@
+name: "Paper Ingest"
+description: "Submit a paper for team review and potential knowledge base entry"
+title: "[Paper] "
+labels: ["paper-ingest"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Paper Submission Form
+        Fill in the fields below to submit a paper for team evaluation. Required fields are marked with *.
+
+  - type: input
+    id: paper_title
+    attributes:
+      label: "Paper Title *"
+      description: "Full title of the paper"
+      placeholder: "e.g., FourCastNet: A Global Data-driven High-resolution Weather Forecasting Model"
+    validations:
+      required: true
+
+  - type: input
+    id: paper_url
+    attributes:
+      label: "Paper URL *"
+      description: "Link to the paper (arXiv, DOI, publisher page)"
+      placeholder: "https://arxiv.org/abs/..."
+    validations:
+      required: true
+
+  - type: input
+    id: code_url
+    attributes:
+      label: "Code URL"
+      description: "Link to the code repository (if available)"
+      placeholder: "https://github.com/..."
+    validations:
+      required: false
+
+  - type: input
+    id: year
+    attributes:
+      label: "Year *"
+      description: "Publication year"
+      placeholder: "2024"
+    validations:
+      required: true
+
+  - type: input
+    id: venue
+    attributes:
+      label: "Venue *"
+      description: "Conference, journal, or preprint server"
+      placeholder: "e.g., NeurIPS 2024, Nature Methods, arXiv preprint"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: domain
+    attributes:
+      label: "Primary Domain *"
+      description: "Which research domain does this paper primarily belong to?"
+      options:
+        - ocean-forecasting
+        - scientific-sr
+        - uncertainty-calibration
+        - code-agent
+    validations:
+      required: true
+
+  - type: input
+    id: tags
+    attributes:
+      label: "Tags *"
+      description: "Comma-separated tags from standards/tag_system.md (min 2: 1 task + 1 method)"
+      placeholder: "e.g., forecasting, transformer, ocean"
+    validations:
+      required: true
+
+  - type: textarea
+    id: one_line_verdict
+    attributes:
+      label: "One-Line Verdict *"
+      description: "A single evaluative sentence — what this paper actually achieves, not what it claims"
+      placeholder: "e.g., Achieves competitive 5-day weather forecasting with FNO but degrades rapidly beyond, suggesting..."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: related_project
+    attributes:
+      label: "Related Project *"
+      description: "Which team project does this paper relate to?"
+      options:
+        - ocean-sr
+        - chl-sr-reliability
+        - agent-loss-migration
+        - none
+    validations:
+      required: true
+
+  - type: textarea
+    id: project_relation
+    attributes:
+      label: "Project Relation *"
+      description: "How specifically does this paper relate to the selected project? If 'none', explain the general relevance."
+      placeholder: "e.g., The FNO architecture could be adapted for our ocean SR pipeline as the backbone encoder..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: why_collect
+    attributes:
+      label: "Why Collect This Paper? *"
+      description: "2-3 sentences on why this paper is worth the team's attention"
+    validations:
+      required: true
+
+  - type: textarea
+    id: core_method
+    attributes:
+      label: "Core Method (Brief)"
+      description: "2-3 sentences describing the key technical approach"
+    validations:
+      required: false
+
+  - type: textarea
+    id: assumptions_weaknesses
+    attributes:
+      label: "Assumptions & Weaknesses (Brief)"
+      description: "Known limitations or unstated assumptions"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: "Suggested Priority *"
+      description: "How urgently should the team look at this?"
+      options:
+        - high
+        - medium
+        - low
+    validations:
+      required: true
+
+  - type: dropdown
+    id: status_suggestion
+    attributes:
+      label: "Suggested Status *"
+      description: "Where should this paper land?"
+      options:
+        - backlog
+        - curated (needs thorough entry first)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: reproduction_value
+    attributes:
+      label: "Reproduction Value"
+      description: "Is it worth reimplementing?"
+      options:
+        - high - core to our pipeline
+        - medium - useful reference implementation
+        - low - read-only value
+        - unknown
+    validations:
+      required: false
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: "Key Evidence"
+      description: "Notable quantitative results, tables, or figures worth highlighting"
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: self_check
+    attributes:
+      label: "Self-Check"
+      description: "Confirm before submitting"
+      options:
+        - label: "I have checked that this paper is not already in the knowledge base"
+          required: true
+        - label: "The one-line verdict contains my own judgment, not a copy of the abstract"
+          required: true
+        - label: "Tags are from standards/tag_system.md"
+          required: true
